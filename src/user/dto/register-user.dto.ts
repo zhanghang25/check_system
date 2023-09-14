@@ -25,6 +25,15 @@ export class RegisterUserDto {
   })
   password: string;
 
+  @IsNotEmpty({
+    message: '作业单位不能为空',
+  })
+  workCompany: string;
+
+  @IsNotEmpty({
+    message: '账号等级不能为空',
+  })
+  grade: number;
   //   @IsNotEmpty({
   //     message: '邮箱不能为空',
   //   })

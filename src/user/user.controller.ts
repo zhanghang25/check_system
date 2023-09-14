@@ -34,7 +34,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { LoginUserVo } from './vo/login-user.vo';
+import { LoginUserVo, LoginUserTokenVo } from './vo/login-user.vo';
 import { RefreshTokenVo } from './vo/refresh-token.vo';
 import { UserListVo } from './vo/user-list.vo';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -107,6 +107,13 @@ export class UserController {
   @Inject(ConfigService)
   private configService: ConfigService;
 
+  @Post('getCheJian')
+  async getCheJian() {
+    const vo = await this.userService.findUserCheJian();
+
+    return vo;
+  }
+
   @ApiBody({
     type: LoginUserDto,
   })
@@ -118,19 +125,19 @@ export class UserController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: '用户信息和 token',
-    type: LoginUserVo,
+    type: LoginUserTokenVo,
   })
   @Post('login')
   async userLogin(@Body() loginUser: LoginUserDto) {
     const vo = await this.userService.login(loginUser, false);
 
-    vo.accessToken = this.jwtService.sign(
+    vo.token = this.jwtService.sign(
       {
-        userId: vo.userInfo.id,
-        username: vo.userInfo.username,
-        email: vo.userInfo.email,
-        roles: vo.userInfo.roles,
-        permissions: vo.userInfo.permissions,
+        userId: vo.userId,
+        username: vo.username,
+        // email: vo.userInfo.email,
+        roleId: vo.roleId,
+        // permissions: vo.userInfo.permissions,
       },
       {
         expiresIn:
@@ -138,62 +145,62 @@ export class UserController {
       },
     );
 
-    vo.refreshToken = this.jwtService.sign(
-      {
-        userId: vo.userInfo.id,
-      },
-      {
-        expiresIn:
-          this.configService.get('jwt_refresh_token_expres_time') || '7d',
-      },
-    );
+    // vo.refreshToken = this.jwtService.sign(
+    //   {
+    //     userId: vo.userInfo.id,
+    //   },
+    //   {
+    //     expiresIn:
+    //       this.configService.get('jwt_refresh_token_expres_time') || '7d',
+    //   },
+    // );
 
     return vo;
   }
 
-  @ApiBody({
-    type: LoginUserDto,
-  })
-  @ApiResponse({
-    status: HttpStatus.BAD_REQUEST,
-    description: '用户不存在/密码错误',
-    type: String,
-  })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: '用户信息和 token',
-    type: LoginUserVo,
-  })
-  @Post('admin/login')
-  async adminLogin(@Body() loginUser: LoginUserDto) {
-    const vo = await this.userService.login(loginUser, true);
+  // @ApiBody({
+  //   type: LoginUserDto,
+  // })
+  // @ApiResponse({
+  //   status: HttpStatus.BAD_REQUEST,
+  //   description: '用户不存在/密码错误',
+  //   type: String,
+  // })
+  // @ApiResponse({
+  //   status: HttpStatus.OK,
+  //   description: '用户信息和 token',
+  //   type: LoginUserVo,
+  // })
+  // @Post('admin/login')
+  // async adminLogin(@Body() loginUser: LoginUserDto) {
+  //   const vo = await this.userService.login(loginUser, true);
 
-    vo.accessToken = this.jwtService.sign(
-      {
-        userId: vo.userInfo.id,
-        username: vo.userInfo.username,
-        email: vo.userInfo.email,
-        roles: vo.userInfo.roles,
-        permissions: vo.userInfo.permissions,
-      },
-      {
-        expiresIn:
-          this.configService.get('jwt_access_token_expires_time') || '30m',
-      },
-    );
+  //   vo.accessToken = this.jwtService.sign(
+  //     {
+  //       userId: vo.userInfo.id,
+  //       username: vo.userInfo.username,
+  //       email: vo.userInfo.email,
+  //       roles: vo.userInfo.roles,
+  //       permissions: vo.userInfo.permissions,
+  //     },
+  //     {
+  //       expiresIn:
+  //         this.configService.get('jwt_access_token_expires_time') || '30m',
+  //     },
+  //   );
 
-    vo.refreshToken = this.jwtService.sign(
-      {
-        userId: vo.userInfo.id,
-      },
-      {
-        expiresIn:
-          this.configService.get('jwt_refresh_token_expres_time') || '7d',
-      },
-    );
+  //   vo.refreshToken = this.jwtService.sign(
+  //     {
+  //       userId: vo.userInfo.id,
+  //     },
+  //     {
+  //       expiresIn:
+  //         this.configService.get('jwt_refresh_token_expres_time') || '7d',
+  //     },
+  //   );
 
-    return vo;
-  }
+  //   return vo;
+  // }
 
   @ApiQuery({
     name: 'refreshToken',
@@ -222,9 +229,10 @@ export class UserController {
         {
           userId: user.id,
           username: user.username,
-          email: user.email,
-          roles: user.roles,
-          permissions: user.permissions,
+          roleId: user.roleId,
+          // email: user.email,
+          // roles: user.roles,
+          // permissions: user.permissions,
         },
         {
           expiresIn:
@@ -280,9 +288,10 @@ export class UserController {
         {
           userId: user.id,
           username: user.username,
-          email: user.email,
-          roles: user.roles,
-          permissions: user.permissions,
+          roleId: user.roleId,
+          // email: user.email,
+          // roles: user.roles,
+          // permissions: user.permissions,
         },
         {
           expiresIn:
@@ -324,13 +333,16 @@ export class UserController {
 
     const vo = new UserDetailVo();
     vo.id = user.id;
-    vo.email = user.email;
     vo.username = user.username;
-    vo.headPic = user.headPic;
-    vo.phoneNumber = user.phoneNumber;
-    vo.nickName = user.nickName;
-    vo.createTime = user.createTime;
-    vo.isFrozen = user.isFrozen;
+    vo.roleId = user.roleId;
+    // vo.id = user.id;
+    // vo.email = user.email;
+    // vo.username = user.username;
+    // vo.headPic = user.headPic;
+    // vo.phoneNumber = user.phoneNumber;
+    // vo.nickName = user.nickName;
+    // vo.createTime = user.createTime;
+    // vo.isFrozen = user.isFrozen;
 
     return vo;
   }
@@ -502,7 +514,11 @@ export class UserController {
       },
       fileFilter(req, file, callback) {
         const extname = path.extname(file.originalname);
-        if (['.png', '.jpg', '.gif'].includes(extname)) {
+        if (
+          ['.png', '.doc', '.docx', '.xls', '.xlsx', '.jpg', '.gif'].includes(
+            extname,
+          )
+        ) {
           callback(null, true);
         } else {
           callback(new BadRequestException('只能上传图片'), false);

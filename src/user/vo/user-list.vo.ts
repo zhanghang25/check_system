@@ -1,38 +1,37 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
 class User {
-    @ApiProperty()
-    id: number;
+  @ApiProperty()
+  id: number;
 
-    @ApiProperty()
-    username: string;
+  @ApiProperty()
+  username: string;
 
-    @ApiProperty()
-    nickName: string;
-    
-    @ApiProperty()
-    email: string; 
+  @ApiProperty()
+  nickName: string;
 
-    @ApiProperty()
-    phoneNumber: string;
+  @ApiProperty()
+  email: string;
 
-    @ApiProperty()
-    isFrozen: boolean;
-    
-    @ApiProperty()
-    headPic: string;
+  @ApiProperty()
+  phoneNumber: string;
 
-    @ApiProperty()
-    createTime: Date;
+  @ApiProperty()
+  isFrozen: boolean;
+
+  @ApiProperty()
+  headPic: string;
+
+  @ApiProperty()
+  createTime: Date;
 }
 
 export class UserListVo {
+  @ApiProperty({
+    type: [User],
+  })
+  users: Array<User>;
 
-    @ApiProperty({
-        type: [User]
-    })
-    users: Array<User>;
-
-    @ApiProperty()
-    totalCount: number;
+  @ApiProperty()
+  totalCount: number;
 }

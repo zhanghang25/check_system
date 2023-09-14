@@ -70,15 +70,20 @@ export class User {
   })
   isAdmin: boolean;
 
+  @Column({
+    comment: '用户角色，1：管理员，2：车间，3：段上',
+  })
+  roleId: number;
+
   @CreateDateColumn()
   createTime: Date;
 
   @UpdateDateColumn()
   updateTime: Date;
 
-  @ManyToMany(() => Role)
-  @JoinTable({
-    name: 'user_roles',
-  })
-  roles: Role[];
+  // @ManyToMany(() => Role)
+  // @JoinTable({
+  //   name: 'user_roles',
+  // })
+  // roles: Role[];
 }

@@ -1,27 +1,30 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
 export class UserDetailVo {
-    @ApiProperty()
-    id: number;
+  @ApiProperty()
+  id: number;
 
-    @ApiProperty()
-    username: string;
+  @ApiProperty()
+  roleId: number;
 
-    @ApiProperty()
-    nickName: string;
+  // username: string;
 
-    @ApiProperty()
-    email: string;
+  @ApiProperty()
+  username: string;
+  // nickName: string;
 
-    @ApiProperty()
-    headPic: string;
+  // @ApiProperty()
+  // email: string;
 
-    @ApiProperty()
-    phoneNumber: string;
+  // @ApiProperty()
+  // headPic: string;
 
-    @ApiProperty()
-    isFrozen: boolean;
+  // @ApiProperty()
+  // phoneNumber: string;
 
-    @ApiProperty()
-    createTime: Date;
+  // @ApiProperty()
+  // isFrozen: boolean;
+
+  // @ApiProperty()
+  // createTime: Date;
 }
