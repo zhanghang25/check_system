@@ -208,25 +208,25 @@ export class UserService {
   }
 
   async updatePassword(passwordDto: UpdateUserPasswordDto) {
-    const captcha = await this.redisService.get(
-      `update_password_captcha_${passwordDto.email}`,
-    );
+    // const captcha = await this.redisService.get(
+    //   `update_password_captcha_${passwordDto.email}`,
+    // );
 
-    if (!captcha) {
-      throw new HttpException('验证码已失效', HttpStatus.BAD_REQUEST);
-    }
+    // if (!captcha) {
+    //   throw new HttpException('验证码已失效', HttpStatus.BAD_REQUEST);
+    // }
 
-    if (passwordDto.captcha !== captcha) {
-      throw new HttpException('验证码不正确', HttpStatus.BAD_REQUEST);
-    }
+    // if (passwordDto.captcha !== captcha) {
+    //   throw new HttpException('验证码不正确', HttpStatus.BAD_REQUEST);
+    // }
 
     const foundUser = await this.userRepository.findOneBy({
       username: passwordDto.username,
     });
 
-    if (foundUser.email !== passwordDto.email) {
-      throw new HttpException('邮箱不正确', HttpStatus.BAD_REQUEST);
-    }
+    // if (foundUser.email !== passwordDto.email) {
+    //   throw new HttpException('邮箱不正确', HttpStatus.BAD_REQUEST);
+    // }
 
     foundUser.password = md5(passwordDto.password);
 

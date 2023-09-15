@@ -14,7 +14,7 @@ import { Observable } from 'rxjs';
 import { UnLoginException } from './unlogin.filter';
 import { Permission } from './user/entities/permission.entity';
 
-interface JwtUserData {
+export interface JwtUserData {
   userId: number;
   username: string;
   roleId: number;
