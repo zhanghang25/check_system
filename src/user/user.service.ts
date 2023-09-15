@@ -10,7 +10,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { RedisService } from 'src/redis/redis.service';
 import { md5 } from 'src/utils';
-import { Like, Repository } from 'typeorm';
+import { Like, Repository, In } from 'typeorm';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { Role } from './entities/role.entity';
 import { User } from './entities/user.entity';
@@ -310,13 +310,13 @@ export class UserService {
     const [users, totalCount] = await this.userRepository.findAndCount({
       select: ['username', 'id'],
       where: {
-        roleId: 2,
+        roleId: In([2, 3]),
       },
     });
 
     const vo = users.map((item) => {
       const newItem = {} as any;
-      newItem.value = item.id;
+      newItem.value = item.username;
       newItem.label = item.username;
       return newItem;
     });

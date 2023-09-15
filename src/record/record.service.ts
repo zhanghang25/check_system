@@ -54,6 +54,9 @@ export class RecordService {
       skip: skipCount,
       take: pageSize,
       where: condition,
+      order: {
+        workDate: 'DESC',
+      },
     });
 
     const vo = new RecordListVo();
