@@ -21,22 +21,29 @@ export class RecordService {
 
   async create(createRecordDto: CreateRecordDto) {
     createRecordDto.workDate = new Date(createRecordDto.workDate);
-    for (let i = 0; i < 100; i++) {
-      const dto = cloneDeep(createRecordDto);
-      await this.recordRepository.save(dto);
-    }
+    // for (let i = 0; i < 100; i++) {
+    const dto = cloneDeep(createRecordDto);
+    await this.recordRepository.save(dto);
+    // }
     return '成功提交记录！';
   }
 
   async findPageAll(
-    { page, pageSize, checkStatus, gradeType, jobType }: FindRecordDto,
+    {
+      page,
+      pageSize,
+      checkStatus,
+      gradeType,
+      jobType,
+      cheJianId,
+    }: FindRecordDto,
     user: JwtUserData,
   ) {
     const skipCount = (page - 1) * pageSize;
 
     const condition: Record<string, any> = {};
 
-    if (checkStatus) {
+    if (!isNil(checkStatus)) {
       condition.checkStatus = checkStatus;
     }
     if (gradeType) {
@@ -44,6 +51,9 @@ export class RecordService {
     }
     if (jobType) {
       condition.jobType = jobType;
+    }
+    if (cheJianId) {
+      condition.cheJianId = cheJianId;
     }
 
     if (!isNil(user) && user.roleId == 2) {

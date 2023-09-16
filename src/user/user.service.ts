@@ -19,6 +19,7 @@ import { LoginUserTokenVo } from './vo/login-user.vo';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserListVo } from './vo/user-list.vo';
+import { JwtUserData } from 'src/login.guard';
 
 @Injectable()
 export class UserService {
@@ -207,7 +208,10 @@ export class UserService {
     return user;
   }
 
-  async updatePassword(passwordDto: UpdateUserPasswordDto) {
+  async updatePassword(
+    passwordDto: UpdateUserPasswordDto,
+    tmpUser: JwtUserData,
+  ) {
     // const captcha = await this.redisService.get(
     //   `update_password_captcha_${passwordDto.email}`,
     // );
@@ -221,8 +225,12 @@ export class UserService {
     // }
 
     const foundUser = await this.userRepository.findOneBy({
-      username: passwordDto.username,
+      username: tmpUser.username,
     });
+
+    if (foundUser.password != md5(passwordDto.oldPassword)) {
+      throw new HttpException('老密码不正确！', HttpStatus.BAD_REQUEST);
+    }
 
     // if (foundUser.email !== passwordDto.email) {
     //   throw new HttpException('邮箱不正确', HttpStatus.BAD_REQUEST);
@@ -306,7 +314,25 @@ export class UserService {
     };
   }
 
-  async findUserCheJian() {
+  async findUserChejian() {
+    const [users, totalCount] = await this.userRepository.findAndCount({
+      select: ['username', 'id'],
+      where: {
+        roleId: 2,
+      },
+    });
+
+    const vo = users.map((item) => {
+      const newItem = {} as any;
+      newItem.value = item.id;
+      newItem.label = item.username;
+      return newItem;
+    });
+
+    return vo;
+  }
+
+  async findUserAccounts() {
     const [users, totalCount] = await this.userRepository.findAndCount({
       select: ['username', 'id'],
       where: {

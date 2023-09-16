@@ -40,6 +40,7 @@ import { UserListVo } from './vo/user-list.vo';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as path from 'path';
 import { storage } from 'src/my-file-storage';
+import { JwtUserData } from 'src/login.guard';
 
 @ApiTags('用户管理模块')
 @Controller('user')
@@ -107,9 +108,16 @@ export class UserController {
   @Inject(ConfigService)
   private configService: ConfigService;
 
+  @Post('getAllAccounts')
+  async getUserAccounts() {
+    const vo = await this.userService.findUserAccounts();
+
+    return vo;
+  }
+
   @Post('getCheJian')
   async getCheJian() {
-    const vo = await this.userService.findUserCheJian();
+    const vo = await this.userService.findUserChejian();
 
     return vo;
   }
@@ -354,9 +362,13 @@ export class UserController {
     type: String,
     description: '验证码已失效/不正确',
   })
+  @RequireLogin()
   @Post(['update_password', 'admin/update_password'])
-  async updatePassword(@Body() passwordDto: UpdateUserPasswordDto) {
-    return await this.userService.updatePassword(passwordDto);
+  async updatePassword(
+    @Body() passwordDto: UpdateUserPasswordDto,
+    @UserInfo() user: JwtUserData,
+  ) {
+    return await this.userService.updatePassword(passwordDto, user);
   }
 
   @ApiQuery({
