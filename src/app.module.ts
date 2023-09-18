@@ -15,6 +15,7 @@ import { LoginGuard } from './login.guard';
 import { PermissionGuard } from './permission.guard';
 import { Record } from './record/entities/record.entity';
 import { RecordModule } from './record/record.module';
+import envConfig from './config/env';
 
 @Module({
   imports: [
@@ -33,13 +34,21 @@ import { RecordModule } from './record/record.module';
     UserModule,
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: 'src/.env',
+      envFilePath: envConfig.path,
     }),
     TypeOrmModule.forRootAsync({
       useFactory(configService: ConfigService) {
+        console.log(
+          '----------------------------------------------------------------:',
+          configService.get('mysql_server_host'),
+        );
+        console.log(
+          configService.get('mysql_server_host') == 'mysql-container',
+        );
         return {
           type: 'mysql',
           host: configService.get('mysql_server_host'),
+          // host: 'mysql-container',
           port: configService.get('mysql_server_port'),
           username: configService.get('mysql_server_username'),
           password: configService.get('mysql_server_password'),
